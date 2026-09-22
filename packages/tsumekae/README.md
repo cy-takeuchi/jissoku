@@ -98,6 +98,7 @@ import { field, toUpdateParams } from "tsumekae";
 | `SetRecord` | `kintone.app.record.set()` に渡す型。`disabled` / `error` を持てる |
 | `Rest` / `RestRecord` | REST API の型 |
 | `Saved` / `Editing` | フィールド型の名前空間 |
+| `LooseRecord` / `LooseField` | 文脈を問わない緩いレコード型。`type` と `value` だけを持つ骨格 |
 | `Api.*` | JS API が受け渡す値の型。**根拠は公式ドキュメント**（実測ではない） |
 | `EventOf<"app.record.detail.show">` | イベント名から event の形を引く |
 | `guard.*` | 型ガード |
@@ -185,6 +186,45 @@ if (!guard.isSubtable(record[code])) return;
 const text = record[code];
 if (guard.isSingleLineText(text) && guard.hasValue(text)) {
   text.value.trim();   // string
+}
+```
+
+### 複数の show 系イベントを1つのハンドラーでまとめる
+
+`create.show` / `edit.show`（PC・モバイル）/ `detail.show` を1つのハンドラーで
+受けると、`record` の形が `CreateRecord` / `SavedRecord` / `EditingRecord` の
+3通りに割れる。
+
+**`event.type` で分岐するなら、素直に絞り込める。** `EventOf<Name>` は
+`Name` に union を渡すと分配されるので、配列で複数イベント名を渡した
+`kintone.events.on` のハンドラーでも同様に効く。
+
+```ts
+kintone.events.on(
+  ["app.record.create.show", "app.record.edit.show", "app.record.detail.show"],
+  (event) => {
+    if (event.type === "app.record.create.show") {
+      event.reuse;     // CreateShowEvent だけが持つ
+    } else {
+      event.recordId;  // detail / edit 側だけ。number
+    }
+  },
+);
+```
+
+**分岐せずに横断的に読み書きしたいときは `LooseRecord` を使う。**
+`CreateRecord` / `SavedRecord` / `EditingRecord` はどれも
+`{ [fieldCode: string]: { type: string; value: unknown } }` という骨格を
+満たすので、`record` の型を `LooseRecord` として扱えばキャスト無しで代入できる。
+「`record` の形が3通りに割れるので緩い型を自分で定義した」という同じ理由付けを
+複数箇所で書き下す必要はない。
+
+```ts
+import type { LooseRecord } from "tsumekae";
+
+function readMemo(record: LooseRecord) {
+  const text = record.メモ;
+  if (guard.isSingleLineText(text)) return text.value;
 }
 ```
 
