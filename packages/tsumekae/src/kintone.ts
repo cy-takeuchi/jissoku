@@ -3,6 +3,14 @@ import type { Api } from "./types/jsApi.js";
 import type { EditingRecord, SetRecord } from "./types/record.js";
 
 /**
+ * `Api` はルート（`tsumekae`）からも出ているが、`tsumekae/kintone` だけを
+ * import している利用者がグローバルの戻り値の中身（`kintone.ProxyResponse` など）を
+ * 参照するには、もう1つ import 文が要る形になっていた（Issue #59）。
+ * 同じ入口から両方触れるように、ここでも export する。
+ */
+export type { Api } from "./types/jsApi.js";
+
+/**
  * kintone のグローバルオブジェクトの型宣言。
  *
  * ## 何を宣言しているか

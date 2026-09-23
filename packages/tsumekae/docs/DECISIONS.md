@@ -2248,6 +2248,23 @@ await withDialogsAccepted(page, async () => { … });
 名前空間の外に戻す変異で、4 レーンすべて `TS2694` で落ちることを確かめた。
 DOM の無い Node レーンでも通る。
 
+## `Api` を `tsumekae/kintone` からも export する
+
+**2026-09-23、Issue #59。** `tsumekae/kintone` だけを import している利用者が
+`kintone.proxy()` の戻り値（`Api.ProxyResponse`）のような、戻り値の中身を
+型引数として直接参照したい場面で、`import type { Api } from "tsumekae";` を
+別に書く必要があった。`Api` 自体はルートから既に export されており、
+気づけば回避できるが、`tsumekae/kintone` だけを見ている利用者からは分からない。
+
+理由は上の「DOM の型は Api 名前空間の中に置く」と同じ構図。
+`exports` が `.` と `./kintone` の 2 つだけなので、利用者から見える入口に
+`Api` を置く。今回は名前空間の中に移すのではなく、`src/kintone.ts` からも
+同じ `Api` を re-export するだけ。**型の中身は変わらない、入口が増えるだけ。**
+
+`src/kintone.ts` は元々 `import type { Api }` を内部で使っており、
+`export type { Api } from "./types/jsApi.js";` を足しても
+`declare global` の扱い（副作用 import でだけ有効）は変わらない。
+
 ## typecheck を無効にすると、型テストは落ちずに消える
 
 `package.json` の `test` は `vitest run --typecheck` だった。

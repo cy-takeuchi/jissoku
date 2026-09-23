@@ -29,6 +29,8 @@ import {
 	toRestWrite,
 	toUpdateParams,
 } from "../../dist/index";
+// Api はサブパスからも読めること（#59）
+import type { Api } from "../../dist/kintone";
 
 // --- 構築 ---
 const num: { type: "NUMBER"; value: string } = field.number(12.5);
@@ -100,6 +102,9 @@ kintone.events.on("app.record.detail.show", (event) => {
 	return event;
 });
 
+// --- Api はルートとサブパスの両方から読めること（#59） ---
+declare const proxyResponse: Api.ProxyResponse;
+
 console.log(rowId, converted, id, revision, update, add, restRecord);
 
-console.log(savedId, savedRevision, editingId, editingRevision);
+console.log(savedId, savedRevision, editingId, editingRevision, proxyResponse);
