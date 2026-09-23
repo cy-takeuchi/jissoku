@@ -29,10 +29,10 @@ e2e が実 kintone を操作して採り直せる。
 「PC と同形だろう」で書いていた型は、実際に測ると 5 つ外れた。
 
 - モバイルの編集画面では、値の入っていないフィールドが `undefined` になる（PC は `""` や `null`）
-- 一覧のインライン編集は `recordId` が文字列。`submit` と `change` は `appId` まで文字列になる
-- `process.proceed` は `appId` / `recordId` を持たない。`action` / `status` / `nextStatus` は `{ value: string }`
-- 削除イベントは `record` を持つ。37 フィールドぶんの値がすべて入っている
-- `change` は画面で形が違う。`create` は `recordId` 無し、`edit` は number、`index.edit` は string
+- 一覧のインライン編集は `recordId` が文字列で、`submit` と `change` は `appId` まで文字列になる
+- `process.proceed` は `appId` / `recordId` を持たず、`action` / `status` / `nextStatus` は `{ value: string }` になる
+- 削除イベントは `record`（37 フィールドぶんの値）を持つ
+- `change` は画面で形が違い、`create` は `recordId` 無し、`edit` は number、`index.edit` は string
 
 ## 使い方
 
