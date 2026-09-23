@@ -11,6 +11,6 @@
 		"biome:check": "biome check --error-on-warnings ."
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.12"
+		"@biomejs/biome": "2.5.14"
 	}
 }
