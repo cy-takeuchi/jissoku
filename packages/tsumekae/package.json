@@ -66,14 +66,14 @@
 	"devDependencies": {
 		"@jissoku/rig": "workspace:*",
 		"@kintone/rest-api-client": "^6.2.1",
-		"@playwright/test": "^1.62.1",
-		"@types/node": "^26.4.1",
-		"dotenv": "^17.4.2",
-		"tsx": "^4.23.13",
+		"@playwright/test": "^1.63.0",
+		"@types/node": "^26.6.2",
+		"dotenv": "^18.0.2",
+		"tsx": "^4.23.15",
 		"typescript": "^7.0.2",
 		"typescript-5.9": "npm:typescript@5.9.3",
-		"vite": "^8.2.2",
-		"vitest": "^5.0.0"
+		"vite": "^8.3.0",
+		"vitest": "^5.0.1"
 	},
 	"sideEffects": false
 }
