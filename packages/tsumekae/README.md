@@ -118,6 +118,16 @@ if (got !== null) {
 | 実測 | `events.on` の event、`record.get()` / `set()` のレコード |
 | 公式ドキュメント | それ以外すべて（`Api` 名前空間）。返る値の形は確かめていない |
 
+`Api` は `tsumekae` と `tsumekae/kintone` の両方から import できる。
+`kintone.proxy()` の戻り値のような、戻り値の中身を型として直接参照したいときに使う。
+
+```ts
+import "tsumekae/kintone";
+import type { Api } from "tsumekae/kintone";
+
+declare function handleProxyResponse(res: Api.ProxyResponse): void;
+```
+
 ### `guard.*`
 
 28 種すべてにある。 判定は `field.type === "その種別"` で、構造は見ない。
