@@ -2342,6 +2342,11 @@ glob を値に持つ設定ファイルでは、行頭がコメントの行だけ
 除外の方針（REST と `set()` で違う）は分けたままで、
 共有したのは「行の配列として読めるか」という骨格の判定だけ。
 
+**2026-09-24 に 9,531 → 9,683 B（`guard.*` は 2,194 → 2,342 B）。**
+`isSavedRecordWithMeta` / `isEditingRecordWithMeta` を `guard/record.ts` に
+追加した分（利用側からの要望。`SavedRecord` → `SavedRecordWithMeta` を
+`as` なしで絞り込みたいというもの）。
+
 突き合わせる先は次の見出しの下だけ。DECISIONS のどこかに
 同じ行が現れても拾わないように、見出しを目印にしている。
 
@@ -2352,8 +2357,8 @@ Vite / esbuild minify / tree-shaking 有効。
 | 使い方 | バンドルに載る量 | gzip |
 |---|--:|--:|
 | **型だけ**（`import type`） | **0 B** | **0 B** |
-| `guard.*` だけ | 2,194 B | 935 B |
-| 全部（`import * as`） | 9,531 B | 3,092 B |
+| `guard.*` だけ | 2,342 B | 987 B |
+| 全部（`import * as`） | 9,683 B | 3,141 B |
 
 ### 入口を再輸出だけにする
 

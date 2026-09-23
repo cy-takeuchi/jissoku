@@ -5,7 +5,15 @@ import { OBSERVED_FIELD_TYPES } from "../../test/fieldTypes";
 import { GUARD_OF } from "../../test/guards";
 import type { Probed } from "../probe/serialize.js";
 import type { ProbeStore, Sample } from "../probe/store.js";
-import { hasValue, isFile, isLookup, isSubtable } from "./record.js";
+import type { EditingRecord, SavedRecord } from "../types/record.js";
+import {
+	hasValue,
+	isEditingRecordWithMeta,
+	isFile,
+	isLookup,
+	isSavedRecordWithMeta,
+	isSubtable,
+} from "./record.js";
 
 /** Probed を元の値に戻す */
 const revive = (probed: Probed): unknown => {
@@ -241,5 +249,72 @@ describe("undefined / null を受ける", () => {
 		expect(isLookup(null)).toBe(false);
 		expect(hasValue(undefined)).toBe(false);
 		expect(hasValue(null)).toBe(false);
+	});
+});
+
+describe("isSavedRecordWithMeta", () => {
+	const savedEvents = [
+		"app.record.detail.show",
+		"mobile.app.record.detail.show",
+		"app.record.print.show",
+		"app.record.edit.show",
+		"app.record.create.submit.success",
+		"app.record.edit.submit.success",
+	];
+
+	test("保存済みレコードが来る文脈では通る", () => {
+		const found = records.filter(
+			({ isRest, label }) =>
+				!isRest && savedEvents.some((event) => label.startsWith(`${event}/`)),
+		);
+		expect(found.length).toBeGreaterThan(0);
+
+		const offenders = found
+			.filter(({ record }) => !isSavedRecordWithMeta(record as SavedRecord))
+			.map(({ label }) => label);
+		expect(offenders).toEqual([]);
+	});
+
+	test("create.show は通らない（$id / $revision を持たないため）", () => {
+		const found = records.filter(
+			({ isRest, label }) =>
+				!isRest && label.startsWith("app.record.create.show/"),
+		);
+		expect(found.length).toBeGreaterThan(0);
+
+		const passed = found
+			.filter(({ record }) => isSavedRecordWithMeta(record as SavedRecord))
+			.map(({ label }) => label);
+		expect(passed).toEqual([]);
+	});
+});
+
+describe("isEditingRecordWithMeta", () => {
+	test("mobile の edit.show（Editing だが保存済み）では通る", () => {
+		const found = records.filter(
+			({ isRest, label }) =>
+				!isRest && label.startsWith("mobile.app.record.edit.show/"),
+		);
+		expect(found.length).toBeGreaterThan(0);
+
+		const offenders = found
+			.filter(({ record }) => !isEditingRecordWithMeta(record as EditingRecord))
+			.map(({ label }) => label);
+		expect(offenders).toEqual([]);
+	});
+
+	test("create.show は通らない（$id / $revision を持たないため）", () => {
+		const found = records.filter(
+			({ isRest, label }) =>
+				!isRest &&
+				(label.startsWith("app.record.create.show/") ||
+					label.startsWith("mobile.app.record.create.show/")),
+		);
+		expect(found.length).toBeGreaterThan(0);
+
+		const passed = found
+			.filter(({ record }) => isEditingRecordWithMeta(record as EditingRecord))
+			.map(({ label }) => label);
+		expect(passed).toEqual([]);
 	});
 });

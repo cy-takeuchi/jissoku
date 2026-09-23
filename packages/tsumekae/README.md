@@ -187,6 +187,26 @@ if (guard.isSingleLineText(text) && guard.hasValue(text)) {
 }
 ```
 
+上の 30 個はフィールド単位。レコード全体を絞り込むものが別に 2 つある。
+
+| ガード | 絞り込み先 |
+|---|---|
+| `isSavedRecordWithMeta` | `SavedRecord` → `SavedRecordWithMeta`（`$id` / `$revision` を持つ） |
+| `isEditingRecordWithMeta` | `EditingRecord` → `EditingRecordWithMeta`（同上） |
+
+`SavedRecord` は索引シグネチャなので `record.$id.value` が 28 種別の合併型になり
+`string` に絞れない。詳細画面・一覧画面・`submit.success` など「保存済みと
+分かっている文脈」でも、`as` を使わずに絞り込むにはこのガードを通す。
+
+```ts
+if (guard.isSavedRecordWithMeta(record)) {
+  record.$id.value;        // string
+  record.$revision.value;  // string
+}
+```
+
+作成画面（`CreateRecord`）には使えない。`$id` / `$revision` が存在しないため。
+
 ### 複数の show 系イベントを1つのハンドラーでまとめる
 
 `create.show` / `edit.show`（PC・モバイル）/ `detail.show` を1つのハンドラーで

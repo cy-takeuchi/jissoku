@@ -1,16 +1,24 @@
 import { describe, expectTypeOf, test } from "vitest";
 import type { Editing, FileInformation, Rest, Saved } from "../types/field.js";
 import type { LooseField, LooseRecord } from "../types/loose.js";
-import type { EditingRecord, SavedRecord, SetRecord } from "../types/record.js";
+import type {
+	EditingRecord,
+	EditingRecordWithMeta,
+	SavedRecord,
+	SavedRecordWithMeta,
+	SetRecord,
+} from "../types/record.js";
 import type { RestRecord } from "../types/rest.js";
 import type * as guards from "./record.js";
 import {
 	hasValue,
 	isCheckBox,
 	isDropdown,
+	isEditingRecordWithMeta,
 	isFile,
 	isLookup,
 	isNumber,
+	isSavedRecordWithMeta,
 	isSingleLineText,
 	isSubtable,
 } from "./record.js";
@@ -69,6 +77,26 @@ describe("Editing のレコードを絞り込む", () => {
 		const f = record.table;
 		if (isSubtable(f)) {
 			expectTypeOf(f.value[0]).toEqualTypeOf<Editing.SubtableRow | undefined>();
+		}
+	});
+});
+
+describe("レコード全体を $id / $revision の有無で絞り込む", () => {
+	test("SavedRecord → SavedRecordWithMeta", () => {
+		const record: SavedRecord = {};
+		if (isSavedRecordWithMeta(record)) {
+			expectTypeOf(record).toEqualTypeOf<SavedRecordWithMeta>();
+			expectTypeOf(record.$id.value).toEqualTypeOf<string>();
+			expectTypeOf(record.$revision.value).toEqualTypeOf<string>();
+		}
+	});
+
+	test("EditingRecord → EditingRecordWithMeta", () => {
+		const record: EditingRecord = {};
+		if (isEditingRecordWithMeta(record)) {
+			expectTypeOf(record).toEqualTypeOf<EditingRecordWithMeta>();
+			expectTypeOf(record.$id.value).toEqualTypeOf<string>();
+			expectTypeOf(record.$revision.value).toEqualTypeOf<string>();
 		}
 	});
 });
@@ -238,12 +266,24 @@ type LeftUnknown = {
 		: K;
 }[Exclude<GuardName, "hasValue">];
 
+/**
+ * `isSavedRecordWithMeta` / `isEditingRecordWithMeta` は `GuardShape` の形に
+ * 合わない。**フィールド単位ではなくレコード単位**（`SavedRecord` /
+ * `EditingRecord` 全体）を絞り込む型述語で、引数が `LooseField` ではない
+ * ため `GuardName` に拾われない（構造的に一致しないので `never` になる）。
+ * この2つだけ明示的に除いて、残りが漏れなく拾えていることを検査する。
+ */
+type RecordLevelGuardName = "isSavedRecordWithMeta" | "isEditingRecordWithMeta";
+
 describe("全ガードを総当たりする", () => {
 	// **`not.toBeNever()` では弱い。** 1 つでも拾えていれば通るので、
 	// 絞り込みの書き方を変えたときに「29 個中 28 個しか拾えていない」状態を
-	// 見逃す。`record.ts` の export は全部が型述語なので、全件と一致するはず
-	test("record.ts の型述語を 1 つ残らず拾えている", () => {
-		expectTypeOf<GuardName>().toEqualTypeOf<keyof typeof guards>();
+	// 見逃す。`record.ts` の export はほぼ全部が型述語なので、
+	// レコード単位の2つを除けば全件と一致するはず
+	test("record.ts のフィールド単位の型述語を1つ残らず拾えている", () => {
+		expectTypeOf<GuardName>().toEqualTypeOf<
+			Exclude<keyof typeof guards, RecordLevelGuardName>
+		>();
 	});
 
 	// 緩い入力で value が絞れないガードがあれば、ここに名前が出て落ちる。

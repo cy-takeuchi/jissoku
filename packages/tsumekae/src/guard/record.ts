@@ -1,5 +1,11 @@
 import type { Editing, Rest, Saved } from "../types/field.js";
 import type { LooseField } from "../types/loose.js";
+import type {
+	EditingRecord,
+	EditingRecordWithMeta,
+	SavedRecord,
+	SavedRecordWithMeta,
+} from "../types/record.js";
 
 /**
  * レコードのフィールドを絞り込む型ガード。
@@ -153,3 +159,36 @@ export const hasValue = <T extends LooseField>(
 	field: T | undefined | null,
 ): field is T & { value: Exclude<T["value"], undefined> } =>
 	field !== undefined && field !== null && field.value !== undefined;
+
+/**
+ * `$id` / `$revision` を実際に持つか（＝保存済みレコードか）を実行時に確かめる。
+ *
+ * `SavedRecord` は索引シグネチャなので `record.$id.value` が 28 種別の合併型に
+ * なり `string` に絞れない（`SavedRecordWithMeta` の doc を参照）。詳細画面・
+ * 一覧画面・`submit.success` など「保存済みと分かっている文脈」でも、
+ * 型だけでは `SavedRecord` → `SavedRecordWithMeta` を安全に代入できないため、
+ * 呼び出し側が `as` でごまかす例があった（利用側からの要望・2026-09-24）。
+ *
+ * ```ts
+ * declare const record: SavedRecord;
+ * if (isSavedRecordWithMeta(record)) {
+ *   record.$id.value;        // string
+ *   record.$revision.value;  // string
+ * }
+ * ```
+ */
+export const isSavedRecordWithMeta = (
+	record: SavedRecord,
+): record is SavedRecordWithMeta =>
+	isId(record.$id) && isRevision(record.$revision);
+
+/**
+ * 編集画面版。理由は {@link isSavedRecordWithMeta} と同じ。
+ *
+ * **作成画面には使えない。** `CreateRecord` は `$id` / `$revision` を持たない
+ * （`EditingRecordWithMeta` の doc を参照）ので、そもそも入力の型に取れない。
+ */
+export const isEditingRecordWithMeta = (
+	record: EditingRecord,
+): record is EditingRecordWithMeta =>
+	isId(record.$id) && isRevision(record.$revision);
