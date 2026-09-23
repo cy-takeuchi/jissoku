@@ -3,7 +3,7 @@
 kintone のフォーム定義（`getFormFields` / `getFormLayout`）を、
 プラグインから扱いやすい形に整えて返す。
 
-**実行時依存を持たない。** `@kintone/rest-api-client` を入れていなくても使える。
+実行時依存を持たない。 `@kintone/rest-api-client` を入れていなくても使える。
 
 ## 何をするのか
 
@@ -26,10 +26,10 @@ const form = toForm(fields.properties, layout.layout);
 
 | | 中身 |
 |---|---|
-| `fields` | フォームに置かれた実フィールド。**レイアウト順**（左上が先、右下が後）。所属あり |
+| `fields` | フォームに置かれた実フィールド。レイアウト順（左上が先、右下が後）。所属あり |
 | `tables` | サブテーブル。中のフィールドは持たない |
 | `groups` | グループ。同上 |
-| `elements` | `SPACER` / `LABEL` / `HR`。**レイアウト順**。所属あり |
+| `elements` | `SPACER` / `LABEL` / `HR`。レイアウト順。所属あり |
 | `unplaced` | `properties` にあって `layout` に無いもの。所属を持たない |
 
 ## 所属は必須で、親のラベルを持つ
@@ -62,9 +62,9 @@ form.fields.filter((f) => f.type === "RADIO_BUTTON" || f.type === "DROP_DOWN");
 // → (Field.RadioButton | Field.Dropdown)[]
 ```
 
-そのために**ルックアップのキーフィールドを種別ごとに分けている**。
+そのためにルックアップのキーフィールドを種別ごとに分けている。
 公式の型は 1 つのメンバで `type: "NUMBER" | "SINGLE_LINE_TEXT"` と宣言していて、
-判別子が 2 値のメンバが混ざると**ユニオン全体の推論が死ぬ**。
+判別子が 2 値のメンバが混ざるとユニオン全体の推論が死ぬ。
 
 ```ts
 // 文字列 1 行で絞ると、通常とルックアップの 2 メンバになる
@@ -74,7 +74,7 @@ for (const f of form.fields.filter((x) => x.type === "SINGLE_LINE_TEXT")) {
 }
 ```
 
-ルックアップのキーフィールドは `maxLength` などを**返さない**（実測）。
+ルックアップのキーフィールドは `maxLength` などを返さない（実測）。
 だから「各型に optional な `lookup` を足す」形は採れない
 （型が「ある」と言うのに実行時は `undefined` になる）。
 
@@ -92,7 +92,7 @@ import type { Properties, Layout, Field, Form } from "kisekae";
 ## なぜ実測なのか
 
 型の根拠は実 kintone から採った `fixtures/form/definition.json`。
-公式の型と全件突き合わせた結果、**乖離が 1 件見つかっている**。
+公式の型と全件突き合わせた結果、乖離が 1 件見つかっている。
 
 `LABEL` と `HR` は `elementId` を返すが、`@kintone/rest-api-client` の型は
 宣言していない。`updateFormLayout` に送っていないので kintone が付けている。
@@ -104,7 +104,7 @@ kisekae はそれを型に出す。乖離の内容は
 ## もっと読む
 
 - [開発する](https://github.com/cy-takeuchi/jissoku/blob/main/packages/kisekae/CONTRIBUTING.md) — 実測の手順、型を足すとき、公開する
-- [設計判断の記録](https://github.com/cy-takeuchi/jissoku/blob/main/packages/kisekae/docs/DECISIONS.md) — 何を決めたか、**何を捨てたか、なぜ捨てたか**
+- [設計判断の記録](https://github.com/cy-takeuchi/jissoku/blob/main/packages/kisekae/docs/DECISIONS.md) — 何を決めたか、何を捨てたか、なぜ捨てたか
 
 ## ライセンス
 
