@@ -1,5 +1,11 @@
 import type { Editing } from "./field.js";
-import type { CreateRecord, EditingRecord, SavedRecord } from "./record.js";
+import type {
+	CreateRecord,
+	EditingRecord,
+	EditingRecordWithMeta,
+	SavedRecord,
+	SavedRecordWithMeta,
+} from "./record.js";
 
 /**
  * kintone のイベント型。
@@ -34,6 +40,15 @@ import type { CreateRecord, EditingRecord, SavedRecord } from "./record.js";
  * 一方で `mobile` の submit / change / process は実際に PC と同形だった。
  * 「違うはずだ」も同じく根拠にならない。
  *
+ * ## `$id` / `$revision` を持つイベントは `*WithMeta` で宣言する
+ *
+ * 作成画面系以外のイベントの `record` は、実測ですべてのサンプルが
+ * `$id` / `$revision` を持っていた（`index.show` は 1 件ずつ）。
+ * 素の `SavedRecord` / `EditingRecord` は索引シグネチャなので
+ * `record.$id.value` が 28 種別の合併型になり、`string` に絞れない。
+ * 事実として持つと分かっているものは、型でもそう言う。
+ * 作成画面系（`CreateRecord`）は持たないので変えない。
+ *
  * ## 条件型について
  *
  * フィールド型を文脈でパラメータ化する条件型は採らない方針だが
@@ -58,7 +73,7 @@ type Base<Type extends string> = {
  */
 export type DetailShowEvent<Type extends string> = Base<Type> & {
 	recordId: number;
-	record: SavedRecord;
+	record: SavedRecordWithMeta;
 };
 
 /**
@@ -71,7 +86,7 @@ export type DetailShowEvent<Type extends string> = Base<Type> & {
  */
 export type EditShowEvent<
 	Type extends string,
-	RecordShape = SavedRecord,
+	RecordShape = SavedRecordWithMeta,
 	RecordId = number,
 > = Base<Type> & {
 	recordId: RecordId;
@@ -100,7 +115,7 @@ export type IndexShowEvent<Type extends string> = Base<Type> & {
 	viewId: number;
 	viewName: string;
 	viewType: "list" | "calendar" | "custom";
-	records: SavedRecord[];
+	records: SavedRecordWithMeta[];
 	offset: number;
 	size: number;
 	/** カレンダービューの表示月。リストビューでは null（実測） */
@@ -189,7 +204,7 @@ export type IndexEditChangeEvent<Type extends string> = {
 	type: Type;
 	appId: string;
 	recordId: string;
-	record: EditingRecord;
+	record: EditingRecordWithMeta;
 	changes: ChangeBody;
 };
 
@@ -231,7 +246,7 @@ export type CreateSubmitEvent<Type extends string> = Base<Type> & {
  */
 export type EditSubmitEvent<Type extends string> = Base<Type> & {
 	recordId: number;
-	record: EditingRecord;
+	record: EditingRecordWithMeta;
 	error?: string;
 };
 
@@ -252,7 +267,7 @@ export type SubmitSuccessEvent<Type extends string, AppId = number> = {
 	 */
 	appId: AppId;
 	recordId: string;
-	record: SavedRecord;
+	record: SavedRecordWithMeta;
 };
 
 /**
@@ -266,7 +281,7 @@ export type IndexEditSubmitEvent<Type extends string> = {
 	type: Type;
 	appId: string;
 	recordId: string;
-	record: EditingRecord;
+	record: EditingRecordWithMeta;
 	/** 設定すると保存を中断できる */
 	error?: string;
 };
@@ -287,7 +302,7 @@ export type IndexEditSubmitEvent<Type extends string> = {
  */
 export type DeleteSubmitEvent<Type extends string> = Base<Type> & {
 	recordId: number;
-	record: SavedRecord;
+	record: SavedRecordWithMeta;
 };
 
 /**
@@ -310,7 +325,7 @@ export type DeleteSubmitEvent<Type extends string> = Base<Type> & {
  */
 export type ProcessProceedEvent<Type extends string> = {
 	type: Type;
-	record: SavedRecord;
+	record: SavedRecordWithMeta;
 	/** 実行したアクション名 */
 	action: { value: string };
 	/** 遷移前のステータス名 */
@@ -353,7 +368,7 @@ type ShowEvents = {
 	 */
 	"mobile.app.record.edit.show": EditShowEvent<
 		"mobile.app.record.edit.show",
-		EditingRecord
+		EditingRecordWithMeta
 	>;
 } & {
 	[K in WithMobile<"app.record.create.show">]: CreateShowEvent<K>;
@@ -423,7 +438,10 @@ type ChangeEvents = {
 		CreateRecord
 	>;
 } & {
-	[K in `app.record.edit.change.${string}`]: EditChangeEvent<K, EditingRecord>;
+	[K in `app.record.edit.change.${string}`]: EditChangeEvent<
+		K,
+		EditingRecordWithMeta
+	>;
 } & {
 	/**
 	 * モバイルの編集画面の change。
@@ -433,7 +451,7 @@ type ChangeEvents = {
 	 */
 	[K in `mobile.app.record.edit.change.${string}`]: EditChangeEvent<
 		K,
-		EditingRecord
+		EditingRecordWithMeta
 	>;
 } & {
 	/**
@@ -459,7 +477,7 @@ type OtherRecordEvents = {
 	 */
 	"app.record.index.edit.show": EditShowEvent<
 		"app.record.index.edit.show",
-		SavedRecord,
+		SavedRecordWithMeta,
 		string
 	>;
 };

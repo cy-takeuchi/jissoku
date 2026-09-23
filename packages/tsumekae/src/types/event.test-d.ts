@@ -5,7 +5,12 @@ import type {
 	KintoneEventName,
 	UnknownKintoneEvent,
 } from "./event.js";
-import type { CreateRecord, EditingRecord, SavedRecord } from "./record.js";
+import type {
+	CreateRecord,
+	EditingRecord,
+	EditingRecordWithMeta,
+	SavedRecordWithMeta,
+} from "./record.js";
 
 /**
  * イベント名から event の形が引けることを確かめる。
@@ -18,13 +23,13 @@ describe("show 系", () => {
 	test("詳細画面は recordId が number で record は Saved", () => {
 		type E = EventOf<"app.record.detail.show">;
 		expectTypeOf<E["recordId"]>().toEqualTypeOf<number>();
-		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecord>();
+		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecordWithMeta>();
 		expectTypeOf<E["appId"]>().toEqualTypeOf<number>();
 	});
 
 	test("編集画面の show はまだ Saved", () => {
 		type E = EventOf<"app.record.edit.show">;
-		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecord>();
+		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecordWithMeta>();
 	});
 
 	test("作成画面は recordId を持たず reuse を持つ", () => {
@@ -41,19 +46,19 @@ describe("show 系", () => {
 		expectTypeOf<E["offset"]>().toEqualTypeOf<number>();
 		expectTypeOf<E["size"]>().toEqualTypeOf<number>();
 		expectTypeOf<E["date"]>().toEqualTypeOf<string | null>();
-		expectTypeOf<E["records"]>().toEqualTypeOf<SavedRecord[]>();
+		expectTypeOf<E["records"]>().toEqualTypeOf<SavedRecordWithMeta[]>();
 	});
 
 	test("モバイル版も同じ形で引ける", () => {
 		type E = EventOf<"mobile.app.record.detail.show">;
-		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecord>();
+		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecordWithMeta>();
 	});
 });
 
 describe("submit 系", () => {
 	test("編集の submit は Editing のレコードを持つ", () => {
 		type E = EventOf<"app.record.edit.submit">;
-		expectTypeOf<E["record"]>().toEqualTypeOf<EditingRecord>();
+		expectTypeOf<E["record"]>().toEqualTypeOf<EditingRecordWithMeta>();
 	});
 
 	test("作成の submit はシステムフィールドを持たないレコード", () => {
@@ -80,7 +85,7 @@ describe("submit 系", () => {
 
 	test("submit.success は record を持つ（url ではない）", () => {
 		type E = EventOf<"app.record.create.submit.success">;
-		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecord>();
+		expectTypeOf<E["record"]>().toEqualTypeOf<SavedRecordWithMeta>();
 		// @ts-expect-error url は存在しない
 		type _ = E["url"];
 	});
@@ -157,13 +162,13 @@ describe("モバイル（2026-09-05 実測）", () => {
 	test("編集画面の record だけ Editing。PC とも詳細画面とも違う", () => {
 		expectTypeOf<
 			EventOf<"mobile.app.record.edit.show">["record"]
-		>().toEqualTypeOf<EditingRecord>();
+		>().toEqualTypeOf<EditingRecordWithMeta>();
 		expectTypeOf<
 			EventOf<"app.record.edit.show">["record"]
-		>().toEqualTypeOf<SavedRecord>();
+		>().toEqualTypeOf<SavedRecordWithMeta>();
 		expectTypeOf<
 			EventOf<"mobile.app.record.detail.show">["record"]
-		>().toEqualTypeOf<SavedRecord>();
+		>().toEqualTypeOf<SavedRecordWithMeta>();
 	});
 });
 
@@ -171,7 +176,7 @@ describe("削除（2026-09-05 実測）", () => {
 	test("record を持つ。当初は持たないと書いていた", () => {
 		expectTypeOf<
 			EventOf<"app.record.detail.delete.submit">["record"]
-		>().toEqualTypeOf<SavedRecord>();
+		>().toEqualTypeOf<SavedRecordWithMeta>();
 	});
 
 	test("3 経路とも同形。一覧からの削除も recordId は number", () => {
@@ -191,7 +196,7 @@ describe("削除（2026-09-05 実測）", () => {
 describe("change 系", () => {
 	test("フィールドコードが埋まったイベント名を引ける", () => {
 		type E = EventOf<"app.record.edit.change.singleLineText">;
-		expectTypeOf<E["record"]>().toEqualTypeOf<EditingRecord>();
+		expectTypeOf<E["record"]>().toEqualTypeOf<EditingRecordWithMeta>();
 		expectTypeOf<E["changes"]["row"]>().not.toBeNever();
 	});
 
@@ -213,6 +218,61 @@ describe("change 系", () => {
 	});
 });
 
+describe("保存済みのレコードは $id / $revision を string として読める", () => {
+	// 実測（fixtures/measured.json）で、作成画面系以外のイベントの record は
+	// すべて $id / $revision を持っていた。as を使わずに updateRecord へ渡せること
+	test("詳細・編集・印刷・保存完了・削除・プロセス管理", () => {
+		const names = [
+			"app.record.detail.show",
+			"mobile.app.record.detail.show",
+			"app.record.print.show",
+			"app.record.edit.show",
+			"mobile.app.record.edit.show",
+			"app.record.index.edit.show",
+			"app.record.edit.change.singleLineText",
+			"mobile.app.record.edit.change.singleLineText",
+			"app.record.index.edit.change.singleLineText",
+			"app.record.edit.submit",
+			"mobile.app.record.edit.submit",
+			"app.record.index.edit.submit",
+			"app.record.create.submit.success",
+			"app.record.edit.submit.success",
+			"app.record.index.edit.submit.success",
+			"app.record.detail.delete.submit",
+			"app.record.index.delete.submit",
+			"app.record.detail.process.proceed",
+		] as const;
+		type Names = (typeof names)[number];
+		type Ids = {
+			[N in Names]: EventOf<N>["record"]["$id"]["value"];
+		}[Names];
+		type Revisions = {
+			[N in Names]: EventOf<N>["record"]["$revision"]["value"];
+		}[Names];
+		expectTypeOf<Ids>().toEqualTypeOf<string>();
+		expectTypeOf<Revisions>().toEqualTypeOf<string>();
+	});
+
+	test("一覧画面の records も 1 件ずつ読める", () => {
+		type E = EventOf<"app.record.index.show">;
+		expectTypeOf<
+			E["records"][number]["$id"]["value"]
+		>().toEqualTypeOf<string>();
+	});
+
+	test("作成画面系は持たない。$id / $revision を保証しない", () => {
+		expectTypeOf<
+			EventOf<"app.record.create.show">["record"]
+		>().not.toMatchTypeOf<SavedRecordWithMeta>();
+		expectTypeOf<
+			EventOf<"app.record.create.submit">["record"]
+		>().not.toMatchTypeOf<SavedRecordWithMeta>();
+		expectTypeOf<
+			EventOf<"app.record.create.change.foo">["record"]
+		>().not.toMatchTypeOf<SavedRecordWithMeta>();
+	});
+});
+
 describe("未知イベントの退避口", () => {
 	test("マップに無い名前は緩い型になる", () => {
 		expectTypeOf<
@@ -231,7 +291,7 @@ describe("kintone.events.on が絞り込めること", () => {
 	test("単一のイベント名", () => {
 		kintone.events.on("app.record.detail.show", (event) => {
 			expectTypeOf(event.recordId).toEqualTypeOf<number>();
-			expectTypeOf(event.record).toEqualTypeOf<SavedRecord>();
+			expectTypeOf(event.record).toEqualTypeOf<SavedRecordWithMeta>();
 			return event;
 		});
 	});
@@ -241,7 +301,7 @@ describe("kintone.events.on が絞り込めること", () => {
 			["app.record.detail.show", "app.record.edit.show"],
 			(event) => {
 				expectTypeOf(event.recordId).toEqualTypeOf<number>();
-				expectTypeOf(event.record).toEqualTypeOf<SavedRecord>();
+				expectTypeOf(event.record).toEqualTypeOf<SavedRecordWithMeta>();
 				return event;
 			},
 		);

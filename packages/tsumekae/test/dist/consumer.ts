@@ -98,7 +98,11 @@ console.log(restNumber.value, restDropdown.value);
 // 型で保証してしまわないため。
 kintone.events.on("app.record.detail.show", (event) => {
 	const recordId: number = event.recordId;
-	console.log(recordId, event.record);
+	// event.record は $id / $revision を string として読める（as 不要）。
+	// 交差型が .d.ts の出力で崩れると、利用者側でだけ string に絞れなくなる
+	const eventRecordId: string = event.record.$id.value;
+	const eventRevision: string = event.record.$revision.value;
+	console.log(recordId, event.record, eventRecordId, eventRevision);
 	return event;
 });
 
