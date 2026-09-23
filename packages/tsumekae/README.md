@@ -8,7 +8,7 @@
 そのため実務では JS API・`event.record`・REST API の3経路が混ざり、
 境界のたびに `as` が必要になる。
 
-このリポジトリはその3経路の実際の値を**測定した上で**型を書き、
+このリポジトリはその3経路の実際の値を測定した上で型を書き、
 境界の変換を関数として提供することを目的とする。
 
 ## 型の裏づけ
@@ -74,7 +74,7 @@ if (got !== null) {
 
 | | |
 |---|---|
-| **TypeScript** | **5.9 以上** |
+| TypeScript | 5.9 以上 |
 | `moduleResolution` | `bundler` / `nodenext` |
 | 実行環境 | ブラウザと Node の両方 |
 
@@ -90,7 +90,7 @@ if (got !== null) {
 | `Rest` / `RestRecord` | REST API の型 |
 | `Saved` / `Editing` | フィールド型の名前空間 |
 | `LooseRecord` / `LooseField` | 文脈を問わない緩いレコード型。`type` と `value` だけを持つ骨格 |
-| `Api.*` | JS API が受け渡す値の型。**根拠は公式ドキュメント**（実測ではない） |
+| `Api.*` | JS API が受け渡す値の型。根拠は公式ドキュメント（実測ではない） |
 | `EventOf<"app.record.detail.show">` | イベント名から event の形を引く |
 | `guard.*` | 型ガード |
 | `field.*` | フィールドの構築 |
@@ -114,8 +114,8 @@ if (got !== null) {
 
 | 根拠 | 対象 |
 |---|---|
-| **実測** | `events.on` の event、`record.get()` / `set()` のレコード |
-| **公式ドキュメント** | それ以外すべて（`Api` 名前空間）。返る値の形は確かめていない |
+| 実測 | `events.on` の event、`record.get()` / `set()` のレコード |
+| 公式ドキュメント | それ以外すべて（`Api` 名前空間）。返る値の形は確かめていない |
 
 ### `guard.*`
 
@@ -199,7 +199,7 @@ kintone.events.on(
 );
 ```
 
-**分岐せずに横断的に読み書きしたいときは `LooseRecord` を使う。**
+分岐せずに横断的に読み書きしたいときは `LooseRecord` を使う。
 `CreateRecord` / `SavedRecord` / `EditingRecord` はどれも
 `{ [fieldCode: string]: { type: string; value: unknown } }` という骨格を
 満たすので、`record` の型を `LooseRecord` として扱えばキャスト無しで代入できる。
