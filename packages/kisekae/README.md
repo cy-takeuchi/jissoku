@@ -14,9 +14,11 @@ import { KintoneRestAPIClient } from "@kintone/rest-api-client";
 import { toForm, guard } from "kisekae";
 
 const client = new KintoneRestAPIClient();
+const app = 1;
+const preview = false;
 const [fields, layout] = await Promise.all([
-  client.app.getFormFields({ app: 1, lang: "user", preview: false }),
-  client.app.getFormLayout({ app: 1, preview: false }),
+  client.app.getFormFields({ app, lang: "user", preview }),
+  client.app.getFormLayout({ app, preview }),
 ]);
 
 const form = toForm(fields.properties, layout.layout);
