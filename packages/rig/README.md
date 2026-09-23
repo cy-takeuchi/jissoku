@@ -18,8 +18,7 @@ tsumekae と kisekae が共有するのは、認証と kintone クライアン�
 
 ## ここに入れないもの
 
-- 検証アプリの構築（`packages/tsumekae/tools/fixture-app/`）。
-  アプリの定義はレコードの実測が主な用途で、まだ tsumekae にある。
-  kisekae は建ったアプリを読むだけ
-- `pack:check`。土台は共通だがシナリオが別物なので、
-  各パッケージが自前に持つ（[`docs/TOOLCHAIN.md`](../../docs/TOOLCHAIN.md)）
+- 検証アプリの構築（`packages/tsumekae/tools/fixture-app/`）  
+  アプリの定義はレコードの実測が主な用途でまだ tsumekae にあり、kisekae は建ったアプリを読むだけ
+- `pack:check`  
+  土台は共通だがシナリオが別物なので、各パッケージが自前に持つ（[`docs/TOOLCHAIN.md`](../../docs/TOOLCHAIN.md)）
