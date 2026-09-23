@@ -7,7 +7,7 @@ kintone が実際に返す形を測り、それを根拠に型を書く。
 | [tsumekae](packages/tsumekae) | レコードの値の型・変換関数・型ガード |
 | [kisekae](packages/kisekae) | フォーム定義を整形して返す |
 
-どちらも**実行時依存を持たない**。`@kintone/rest-api-client` は
+どちらも実行時依存を持たない。`@kintone/rest-api-client` は
 型の突き合わせにだけ使う devDependency で、公開する `.d.ts` からは参照しない。
 それを `pack:check` が毎回、依存の実体で確かめている。
 
