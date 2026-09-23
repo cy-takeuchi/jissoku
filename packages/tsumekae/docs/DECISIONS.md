@@ -2595,3 +2595,42 @@ export type EditingRecordWithMeta = EditingRecord & { $id: Editing.Id; $revision
 `test/dist/consumer.ts` が `.d.ts` の出力でも交差型が保たれることを見る。
 TS 7 で `field.subtableRow` の `id?: never` が宣言出力から落ちた前例があり、
 **src のテストが全部通ったまま利用者側だけ壊れる**ことが実際に起きている。
+
+## イベントの `record` を `*WithMeta` で宣言する
+
+**2026-09-24。** Issue #34 で `SavedRecordWithMeta` / `EditingRecordWithMeta` を
+用意したが、`event.ts` は相変わらず素の `SavedRecord` / `EditingRecord` で
+宣言していた。利用側は詳細画面の `event.record` から `$id.value` を読むたびに
+`SavedRecordWithMeta` へ `as` でごまかしていた。
+
+**実測では、作成画面系以外のイベントの `record` はすべてのサンプルで
+`$id`（`__ID__`）と `$revision`（`__REVISION__`）を string で持っていた。**
+`index.show` は `records` の 1 件ずつ（PC 8 件 / モバイル 6 件）まで見た。
+持たないのは作成画面系（`create.show` / `create.change.*` / `create.submit`）だけ。
+事実として持つと分かっているものを、型が「持たないかもしれない」と言っていた。
+
+**決定**: 次のイベントの `record` を `*WithMeta` にする。作成画面系は変えない。
+
+| 型 | イベント |
+|---|---|
+| `SavedRecordWithMeta` | `detail.show` / `print.show` / `index.edit.show` / `submit.success` / `detail.delete.submit` / `index.delete.submit` / `process.proceed` / `index.show` の `records` |
+| `EditingRecordWithMeta` | `edit.show`（モバイル）/ `edit.change.*` / `edit.submit` / `index.edit.change.*` / `index.edit.submit` |
+
+`WithMeta` は素の型に代入できるので、`event.record` を読む側は壊れない。
+**壊れうるのは、`event.record` に素の `SavedRecord` / `EditingRecord` 型の値を
+丸ごと代入して返すコード**（`$id` を持たない型を代入することになる）。
+
+**捨てた選択肢: 実行時の型ガード**（`isSavedRecordWithMeta` を足す案、PR #62）。
+実測で必ず持つと分かっている文脈では、ガードは「起こり得ない else」を利用者に
+書かせ、実行時のコストも払わせる。型で言えることは型で言う。
+`guard/record.ts` の全 export がフィールド単位の型述語であるという
+`guard.test-d.ts` の不変条件も、この 2 つだけ除外しないと保てなかった。
+
+**ガードが要る場面は別にある**: `kintone.app.record.get()` は作成画面でも
+編集画面でも `EditingRecord` を返し、共用ハンドラーでは編集画面かどうかが
+型からは決まらない。そこは実行時に見るしかない。必要になったら足す。
+
+`event.test-d.ts` に、上のイベントすべてで `record.$id.value` が `string` に
+なること、作成画面系が `SavedRecordWithMeta` を満たさないことを足した。
+`DetailShowEvent` と `IndexShowEvent` を素の型に戻す変異で、追加したテストが
+落ちることを確かめた。`test/dist/consumer.ts` にも `.d.ts` 出力後の確認を足した。
