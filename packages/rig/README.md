@@ -1,6 +1,6 @@
 # @jissoku/rig
 
-実測の足場。**公開しない**（`private: true`）。
+実測の足場。公開しない（`private: true`）。
 
 tsumekae と kisekae が共有するのは、認証と kintone クライアントと
 実行スクリプトの入口だけ。
@@ -13,13 +13,13 @@ tsumekae と kisekae が共有するのは、認証と kintone クライアン�
 | `describeError` | REST エラーの `errors` を展開する |
 | `run` | 実行スクリプトの入口。失敗時の出力と終了コードを 1 箇所にする |
 
-**ビルドしない。** `tsx` が TypeScript を直に実行するので、
+ビルドしない。 `tsx` が TypeScript を直に実行するので、
 `exports` はソースを指している。
 
 ## ここに入れないもの
 
-- **検証アプリの構築**（`packages/tsumekae/tools/fixture-app/`）。
+- 検証アプリの構築（`packages/tsumekae/tools/fixture-app/`）。
   アプリの定義はレコードの実測が主な用途で、まだ tsumekae にある。
   kisekae は建ったアプリを読むだけ
-- **`pack:check`**。土台は共通だがシナリオが別物なので、
+- `pack:check`。土台は共通だがシナリオが別物なので、
   各パッケージが自前に持つ（[`docs/TOOLCHAIN.md`](../../docs/TOOLCHAIN.md)）
