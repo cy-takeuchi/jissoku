@@ -14,27 +14,25 @@
 ## 型の裏づけ
 
 型は推測ではなく**実測**に基づく。
-`fixtures/measured.json` に **82 サンプル / 67 文脈**あり、
+`fixtures/measured.json` に 82 サンプル / 67 文脈あり、
 e2e が実 kintone を操作して採り直せる。
 
-- **フィールド種別 28 種**すべてに裏づけがある
+- フィールド種別 28 種すべてに裏づけがある
   （`GROUP` と `REFERENCE_TABLE` は「レコードには現れない」ことを確かめた上で除外）
-- **レコード系イベント 30 種すべて**に裏づけがある
+- レコード系イベント 30 種すべてに裏づけがある
 - 書き込みの受け入れ挙動も実測（REST 20 ケース / `set()` 22 ケース）
-- 2 回続けて採ると**バイト単位で同じ結果**になる。
-  だから差分が出たら「kintone が変わった」と言える。週次で自動的に確かめている
+- 2 回続けて採るとバイト単位で同じ結果になる。
+  差分が出たら「kintone が変わった」と言える。週次で自動的に確かめている
 
 ### なぜ実測が要るのか
 
 「PC と同形だろう」で書いていた型は、実際に測ると 5 つ外れた。
 
-| 書いてあったこと | 実測 |
-| --- | --- |
-| モバイルの編集画面も `Saved` | **`Editing`**。値の無いフィールドが `undefined` |
-| 一覧のインライン編集は編集画面と同形 | `recordId` が**文字列**。`submit` と `change` は `appId` まで文字列 |
-| `process.proceed` は `appId` / `recordId` を持つ | **持たない**。`action` / `status` / `nextStatus` は `{ value: string }` |
-| 削除は `record` を持たない | **持つ**（37 フィールドの `Saved` レコード） |
-| `change` は画面によらず同形 | `create` は `recordId` 無し / `edit` は number / `index.edit` は string |
+- モバイルの編集画面では、値の入っていないフィールドが `undefined` になる（PC は `""` や `null`）
+- 一覧のインライン編集は `recordId` が文字列。`submit` と `change` は `appId` まで文字列になる
+- `process.proceed` は `appId` / `recordId` を持たない。`action` / `status` / `nextStatus` は `{ value: string }`
+- 削除イベントは `record` を持つ。37 フィールドぶんの値がすべて入っている
+- `change` は画面で形が違う。`create` は `recordId` 無し、`edit` は number、`index.edit` は string
 
 ## 使い方
 
@@ -77,17 +75,10 @@ if (got !== null) {
 | | |
 |---|---|
 | **TypeScript** | **5.9 以上** |
-| `moduleResolution` | `bundler` / `nodenext`（`node10` は TS 7 で削除されたため対象外） |
+| `moduleResolution` | `bundler` / `nodenext` |
 | 実行環境 | ブラウザと Node の両方 |
-| 実行時依存 | **ゼロ** |
 
-`tsumekae/kintone` を import しなければ、`kintone` グローバルも DOM も要らない。
-AWS Lambda などサーバサイドで本体だけを使える。
-
-```ts
-// lib に DOM を入れていなくても通る
-import { field, toUpdateParams } from "tsumekae";
-```
+`tsumekae/kintone` を import しなければ、AWS Lambda などサーバサイドで本体だけを使える。
 
 ## API
 
@@ -115,8 +106,8 @@ import { field, toUpdateParams } from "tsumekae";
 （ライブラリが利用者のグローバルスコープを勝手に書き換えないため）。
 
 [公式ドキュメントの JS API 一覧](https://cybozu.dev/ja/kintone/docs/js-api/)
-に載っている **166 個すべて**を宣言する。`@kintone/dts-gen` は 51 個で、
-それは公式一覧の真部分集合なので **dts-gen は要らない**。
+に載っている 166 個すべてを宣言する。`@kintone/dts-gen` は 51 個で、
+それは公式一覧の真部分集合なので dts-gen は要らない。
 
 根拠は 2 種類あり、混ぜていない。
 
