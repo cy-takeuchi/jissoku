@@ -106,7 +106,8 @@ if (got !== null) {
 （ライブラリが利用者のグローバルスコープを勝手に書き換えないため）。
 
 [公式ドキュメントの JS API 一覧](https://cybozu.dev/ja/kintone/docs/js-api/)
-に載っている 166 個すべてを宣言する。`@kintone/dts-gen` は 51 個で、
+に載っているものをすべて宣言する（2026-09-08 時点で 166 個）。
+`@kintone/dts-gen` はそのうち 51 個しか宣言しておらず、
 それは公式一覧の真部分集合なので dts-gen は要らない。
 
 根拠は 2 種類あり、混ぜていない。
@@ -116,14 +117,9 @@ if (got !== null) {
 | **実測** | `events.on` の event、`record.get()` / `set()` のレコード |
 | **公式ドキュメント** | それ以外すべて（`Api` 名前空間）。返る値の形は確かめていない |
 
-**自前の `kintone.d.ts` を持っているなら、置き換えればよい。**
-残したい場合は `tsumekae/kintone` を import せず、自分の `declare global` の中で
-`EditingRecord` / `SetRecord` / `EventOf` を参照する
-（理由と手順は [DECISIONS](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/docs/DECISIONS.md)）。
-
 ### `guard.*`
 
-**28 種別すべてにある。** 判定は `field.type === "その種別"` の一点で、構造は見ない。
+28 種すべてにある。 判定は `field.type === "その種別"` で、構造は見ない。
 
 ```ts
 import { guard } from "tsumekae";
@@ -167,8 +163,8 @@ if (!guard.isSubtable(record[code])) return;
 
 | ガード | 判定の根拠 |
 |---|---|
-| `isLookup` | **`confirmed` と `recordId` のキーの有無。** ルックアップのキーフィールドの `type` は元フィールドの型そのもので、`type` では区別できない。REST から取ったレコードでは常に `false` |
-| `hasValue` | **`value !== undefined`。** `Editing` では一度も値が設定されていないフィールドの `value` が `undefined` になる。`""` や `[]` や `null` は通す |
+| `isLookup` | `confirmed` と `recordId` のキーの有無。 ルックアップのキーフィールドの `type` は元フィールドの型そのもので、`type` では区別できない。REST から取ったレコードでは常に `false` |
+| `hasValue` | `value !== undefined`。 `Editing` では一度も値が設定されていないフィールドの `value` が `undefined` になる。`""` や `[]` や `null` は通す |
 
 絞り込み先は入力の型で決まる。`SavedRecord` から引けば `Saved` の型に、
 `LooseRecord` から引けば 3 文脈の union になる。
@@ -184,9 +180,9 @@ if (guard.isSingleLineText(text) && guard.hasValue(text)) {
 
 `create.show` / `edit.show`（PC・モバイル）/ `detail.show` を1つのハンドラーで
 受けると、`record` の形が `CreateRecord` / `SavedRecord` / `EditingRecord` の
-3通りに割れる。
+3種類になる。
 
-**`event.type` で分岐するなら、素直に絞り込める。** `EventOf<Name>` は
+`event.type` で分岐するなら、素直に絞り込める。 `EventOf<Name>` は
 `Name` に union を渡すと分配されるので、配列で複数イベント名を渡した
 `kintone.events.on` のハンドラーでも同様に効く。
 
@@ -207,7 +203,7 @@ kintone.events.on(
 `CreateRecord` / `SavedRecord` / `EditingRecord` はどれも
 `{ [fieldCode: string]: { type: string; value: unknown } }` という骨格を
 満たすので、`record` の型を `LooseRecord` として扱えばキャスト無しで代入できる。
-「`record` の形が3通りに割れるので緩い型を自分で定義した」という同じ理由付けを
+「`record` の形が3種類になるので緩い型を自分で定義した」という同じ理由付けを
 複数箇所で書き下す必要はない。
 
 ```ts
@@ -233,8 +229,8 @@ kintone.app.record.set({ record: toSetRecord(record) });
 - [`fixtures/measured.json`](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/fixtures/measured.json) — 型の唯一の根拠。実測データそのもの
 - [`fixtures/write-behavior.md`](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/fixtures/write-behavior.md) — REST 書き込みの受け入れ挙動（20 ケース）
 - [`fixtures/set-behavior.md`](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/fixtures/set-behavior.md) — `kintone.app.record.set()` の受け入れ挙動（22 ケース）
-- [設計判断の記録](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/docs/DECISIONS.md) — 何を決めたか、**何を捨てたか、なぜ捨てたか**。
-  実測で判明した kintone / API の制約と、**測り方を間違えた記録**も入っている
+- [設計判断の記録](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/docs/DECISIONS.md) — 何を決めたか、何を捨てたか、なぜ捨てたか。
+  実測で判明した kintone / API の制約と、測り方を間違えた記録も入っている
 - [開発する](https://github.com/cy-takeuchi/jissoku/blob/main/packages/tsumekae/CONTRIBUTING.md) — 実測の手順。共通の手順は[ルート](https://github.com/cy-takeuchi/jissoku/blob/main/CONTRIBUTING.md)
 
 ## ライセンス
