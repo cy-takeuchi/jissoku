@@ -119,8 +119,8 @@ importers:
         specifier: workspace:*
         version: link:../rig
       '@kintone/rest-api-client':
-        specifier: ^6.2.1
-        version: 6.2.1(debug@4.4.3)
+        specifier: ^6.6.0
+        version: 6.6.0(debug@4.4.3)
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -143,8 +143,8 @@ importers:
   packages/rig:
     devDependencies:
       '@kintone/rest-api-client':
-        specifier: ^6.2.1
-        version: 6.2.1(debug@4.4.3)
+        specifier: ^6.6.0
+        version: 6.6.0(debug@4.4.3)
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -164,8 +164,8 @@ importers:
         specifier: workspace:*
         version: link:../rig
       '@kintone/rest-api-client':
-        specifier: ^6.2.1
-        version: 6.2.1(debug@4.4.3)
+        specifier: ^6.6.0
+        version: 6.6.0(debug@4.4.3)
       '@playwright/test':
         specifier: ^1.63.0
         version: 1.63.0
@@ -416,8 +416,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kintone/rest-api-client@6.2.1':
-    resolution: {integrity: sha512-sPFz+0wy/pGmxbORPT/WLtwHvmwwtu7M/f/0Oqi7S+omwb46SGyx16TuSLdrTX1cJEr6YnHjQrI/tNsBlDWzmw==}
+  '@kintone/rest-api-client@6.6.0':
+    resolution: {integrity: sha512-0pa2wo/zOGPbCIMru5dsszXgCqFxSrfejouioMXUabdl0zHWp+9mdQKlPcSLp3fuDamCQK8pLDKpViYI3n9hcA==}
     engines: {node: '>=20'}
 
   '@oxc-project/types@0.147.0':
@@ -684,8 +684,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.18.1:
-    resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
+  axios@1.20.0:
+    resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -818,8 +818,8 @@ packages:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
 
-  js-base64@3.8.0:
-    resolution: {integrity: sha512-65kvbemyZhj+ExQt1PEFyBEjL5vAHysu1lJdW1AwhhChkO8ZBPizYk/m9GVrpbS2Je1hF+UYZ+6KywqtZV8mHw==}
+  js-base64@3.9.4:
+    resolution: {integrity: sha512-PtOMXpEGuP0RRiRXsjzHzl44dMHxSu2CPvAhinupR1tBa88me+1DPqsobl7eupn5UukjLkln1ZnAOAOXOrYG0Q==}
 
   lightningcss-android-arm64@1.33.0:
     resolution: {integrity: sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==}
@@ -956,8 +956,8 @@ packages:
     resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
     engines: {node: '>=10'}
 
-  qs@6.15.3:
-    resolution: {integrity: sha512-O9gl3zCl5h5blw1KGUzQKhA5oUXSl8rwUIM5o0S3nCXMliSvy5Dzx7/DJcI+SwgICv+IneSZwhBh1oSyEHA71A==}
+  qs@6.16.0:
+    resolution: {integrity: sha512-h6fhOIaRrID2CbEY2fqs+7t+UXZo+MLAnU5gRIq85uFtdiUPCdsApMlHhXogKVM4HM2DVbIjGNTTYH2OcmP1vA==}
     engines: {node: '>=0.6'}
 
   rolldown@1.2.6:
@@ -1242,13 +1242,13 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kintone/rest-api-client@6.2.1(debug@4.4.3)':
+  '@kintone/rest-api-client@6.6.0(debug@4.4.3)':
     dependencies:
-      axios: 1.18.1(debug@4.4.3)
+      axios: 1.20.0(debug@4.4.3)
       form-data: 4.0.6
-      js-base64: 3.8.0
+      js-base64: 3.9.4
       mime: 3.0.0
-      qs: 6.15.3
+      qs: 6.16.0
     transitivePeerDependencies:
       - debug
       - supports-color
@@ -1409,7 +1409,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.18.1(debug@4.4.3):
+  axios@1.20.0(debug@4.4.3):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.6
@@ -1561,7 +1561,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  js-base64@3.8.0: {}
+  js-base64@3.9.4: {}
 
   lightningcss-android-arm64@1.33.0:
     optional: true
@@ -1652,7 +1652,7 @@ snapshots:
 
   proxy-from-env@2.1.0: {}
 
-  qs@6.15.3:
+  qs@6.16.0:
     dependencies:
       es-define-property: 1.0.1
       side-channel: 1.1.1
