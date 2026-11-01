@@ -51,7 +51,7 @@
 	},
 	"devDependencies": {
 		"@jissoku/rig": "workspace:*",
-		"@kintone/rest-api-client": "^6.2.1",
+		"@kintone/rest-api-client": "^6.6.0",
 		"@types/node": "^26.6.2",
 		"tsx": "^4.23.15",
 		"typescript": "^7.0.2",
